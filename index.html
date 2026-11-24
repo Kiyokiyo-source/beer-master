@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101820"><title>BEER MASTER</title>
+<style>
+:root{color-scheme:dark;--bg:#101820;--panel:#1b2933;--gold:#f5bd4f;--foam:#fff4d6;--beer:#e99a24;--muted:#a9b8c2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#263d4a,var(--bg) 55%);color:#f7f7f2;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;min-height:100svh}
+main{width:min(100%,480px);margin:auto;padding:24px 18px 32px;text-align:center}.brand{letter-spacing:.22em;font-size:13px;color:var(--gold);font-weight:800}.title{font-size:32px;font-weight:900;margin:5px 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+.panel{background:#1b2933dd;border:1px solid #ffffff18;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 12px 30px #0003}
+.target{font-size:14px;color:var(--muted)}.target strong{display:block;color:var(--gold);font-size:36px;margin-top:2px}
+.glass-wrap{height:290px;display:flex;align-items:flex-end;justify-content:center;padding:10px 0 0}
+.glass{width:150px;height:260px;border:5px solid #d9e4e8;border-top:0;border-radius:5px 5px 28px 28px;position:relative;overflow:hidden;background:#ffffff08;box-shadow:inset 0 0 18px #fff2,0 8px 22px #0004;transform:perspective(500px) rotateX(-2deg)}
+.liquid{position:absolute;bottom:0;left:0;width:100%;height:0;background:linear-gradient(90deg,#b96b13,#f4b638 48%,#d88718);transition:height .05s linear}
+.foam{position:absolute;bottom:0;left:0;width:100%;height:0;background:linear-gradient(#fff9e9,#f8e9c5);transition:height .05s linear}
+.bubbles{position:absolute;inset:0;background-image:radial-gradient(#fff9 1px,transparent 2px),radial-gradient(#fff6 1px,transparent 2px);background-size:23px 29px,31px 37px;background-position:0 0,10px 13px;opacity:.35;pointer-events:none}
+.glass-mark{position:absolute;right:8px;top:8px;color:#ffffff80;font-size:10px;writing-mode:vertical-rl;letter-spacing:.1em}
+.stats{display:flex;justify-content:space-around;color:var(--muted);font-size:12px;margin-top:10px}.stats b{display:block;color:white;font-size:19px;margin-top:3px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+button{border:0;border-radius:16px;padding:17px 10px;font:inherit;font-weight:800;touch-action:none;user-select:none;-webkit-user-select:none}
+.pour{background:var(--gold);color:#38240a;box-shadow:0 5px 0 #a66b19}.pour.foam-btn{background:var(--foam);color:#53452d;box-shadow:0 5px 0 #c8b98f}
+.pour:active{transform:translateY(3px);box-shadow:0 2px 0 #a66b19}.pour small{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:4px}
+.action{background:#344956;color:white;width:100%;margin-top:15px}.hint{font-size:12px;color:var(--muted);line-height:1.6;margin:12px 0 0}
+.hidden{display:none!important}.result-score{font-size:54px;color:var(--gold);font-weight:900}.result-title{font-size:24px;font-weight:900;margin:4px}.achievement{background:#263a45;border-radius:14px;padding:12px;margin:8px 0;text-align:left;font-size:13px}.achievement b{color:var(--gold)}.rounddots{display:flex;gap:6px;justify-content:center;margin:12px}.dot{width:8px;height:8px;border-radius:50%;background:#52636d}.dot.done{background:var(--gold)}
+</style></head>
+<body><main>
+<div class="brand">THE PERFECT POUR CHALLENGE</div><div class="title">BEER MASTER</div><p class="sub">泡まで美しく注げ。目指せ、完璧な一杯。</p>
+<section id="game">
+<div class="panel">
+<div class="target">今回のお題 <strong id="target">泡 25%</strong></div>
+<div class="glass-wrap"><div class="glass"><div class="liquid" id="liquid"></div><div class="foam" id="foam"></div><div class="bubbles"></div><div class="glass-mark">BEER MASTER</div></div></div>
+<div class="stats"><div>ビール<b id="beerVal">0%</b></div><div>泡<b id="foamVal">0%</b></div><div>合計<b id="totalVal">0%</b></div></div>
+<div class="rounddots" id="dots"></div>
+<div class="controls"><button class="pour" id="beerBtn">🍺 ビールを注ぐ<small>押している間、注がれる</small></button><button class="pour foam-btn" id="foamBtn">☁️ 泡を注ぐ<small>押している間、注がれる</small></button></div>
+<p class="hint">ボタンを長押しして注ごう。グラスの合計100%を目指せ！<br>全5ラウンドで腕前を判定するよ。</p>
+<button class="action" id="judgeBtn">この一杯を完成させる</button>
+</div></section>
+<section id="result" class="panel hidden"><div class="target">ROUND RESULT</div><div class="result-score" id="score">--</div><div class="result-title" id="resultTitle"></div><p id="resultText" class="hint"></p><button class="action" id="nextBtn">次のラウンドへ</button></section>
+<section id="final" class="panel hidden"><div class="target">YOUR RANK</div><div class="result-title" id="rankTitle"></div><div class="result-score" id="finalScore"></div><p class="hint" id="finalText"></p><div id="badges"></div><button class="action" id="restartBtn">もう一度挑戦する</button></section>
+</main>
+<script>
+(()=>{const $=id=>document.getElementById(id);let beer=0,foam=0,target=25,round=1,scores=[],holding=null,timer=null;
+const clamp=n=>Math.max(0,Math.min(100,n));function setTarget(){target=Math.floor(Math.random()*31)+10;$('target').textContent='泡 '+target+'%';}
+function render(){$('liquid').style.height=(beer)+'%';$('foam').style.height=(foam)+'%';$('beerVal').textContent=Math.round(beer)+'%';$('foamVal').textContent=Math.round(foam)+'%';$('totalVal').textContent=Math.round(beer+foam)+'%';$('dots').innerHTML=Array.from({length:5},(_,i)=>'<span class="dot '+(i<round?'done':'')+'"></span>').join('');}
+function pour(kind){if(beer+foam>=100)return;if(kind==='beer')beer=Math.min(100-foam,beer+0.75);else foam=Math.min(100-beer,foam+0.75);render();}
+function stop(){if(timer)clearInterval(timer);timer=null;holding=null;}
+function bind(btn,kind){btn.addEventListener('pointerdown',e=>{e.preventDefault();stop();holding=kind;pour(kind);timer=setInterval(()=>{if(holding)pour(holding)},45)});['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,stop));}
+bind($('beerBtn'),'beer');bind($('foamBtn'),'foam');document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
+function reset(){beer=0;foam=0;render();setTarget();}
+function judge(){stop();let total=beer+foam,actual=total?foam/total*100:0;let fillError=Math.abs(100-total),foamError=Math.abs(target-actual);let score=Math.max(0,Math.round(100-(foamError*1.7)-(fillError*1.25)));if(total<35)score=Math.min(score,25);scores.push(score);$('game').classList.add('hidden');$('result').classList.remove('hidden');$('score').textContent=score+'点';let t=score>=95?'神泡マスター':score>=85?'職人級':score>=70?'上出来！':score>=50?'あと一歩':'修行中';$('resultTitle').textContent=t;$('resultText').textContent='目標の泡 '+target+'% ／ 実際の泡 '+Math.round(actual)+'% ／ 注いだ量 '+Math.round(total)+'%';$('nextBtn').textContent=round===5?'最終結果を見る':'次のラウンドへ';}
+$('judgeBtn').addEventListener('click',judge);
+$('nextBtn').addEventListener('click',()=>{if(round===5){finish();return}round++;$('result').classList.add('hidden');$('game').classList.remove('hidden');reset()});
+function finish(){let avg=Math.round(scores.reduce((a,b)=>a+b,0)/5);let rank=avg>=95?'伝説のビールマスター':avg>=85?'ゴールドバーテンダー':avg>=70?'一流注ぎ師':avg>=50?'ビール見習い':'泡との戦いは続く…';let badges=[];if(Math.max(...scores)>=95)badges.push('🏆 <b>神業の一杯</b>：95点以上を獲得');if(scores.every(s=>s>=70))badges.push('🎖️ <b>安定の職人</b>：全ラウンド70点以上');if(scores[4]>=scores[0])badges.push('📈 <b>成長株</b>：最終ラウンドで初回以上');$('result').classList.add('hidden');$('final').classList.remove('hidden');$('rankTitle').textContent=rank;$('finalScore').textContent=avg+'点';$('finalText').textContent='5杯の平均スコア：'+avg+'点';$('badges').innerHTML=badges.length?badges.map(x=>'<div class="achievement">'+x+'</div>').join():'<div class="achievement">🍺 <b>挑戦者</b>：次は実績解除を目指そう！</div>'}
+$('restartBtn').addEventListener('click',()=>{round=1;scores=[];$('final').classList.add('hidden');$('game').classList.remove('hidden');reset()});reset();
+})();
+</script></body></html>
