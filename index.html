@@ -20,7 +20,7 @@ main{width:min(100%,480px);margin:auto;padding:22px 16px 34px;text-align:center}
 .bottle:before{content:"";position:absolute;left:-34px;top:13px;width:38px;height:25px;border-radius:5px 0 0 5px;background:linear-gradient(#78984c,#395c32);border:2px solid #9bb36d}
 .bottle:after{content:"";position:absolute;left:-42px;top:15px;width:10px;height:21px;border-radius:3px;background:#c8b77b;border:1px solid #eee0a8}
 .bottle-label{position:absolute;left:54px;top:9px;width:70px;height:34px;background:#eee4c2;color:#4b432b;border-radius:4px;font-size:9px;font-weight:900;display:grid;place-items:center;letter-spacing:.08em}
-.stream{position:absolute;height:0;width:4px;background:linear-gradient(90deg,#b87520 0%,#ffe9a8 32%,#fff8d9 50%,#edb84c 72%,#b87520 100%);border-radius:50%;z-index:4;pointer-events:none;transform-origin:top center;opacity:.92;filter:drop-shadow(0 0 3px #f5bd4f88);overflow:visible}\n.stream .drop{position:absolute;left:50%;display:block;width:10px;height:14px;margin-left:-5px;border-radius:55% 45% 58% 42%;background:radial-gradient(ellipse at 28% 22%,#fffde1 0 10%,#ffe08a 20%,#f2b943 48%,#c47a19 100%);box-shadow:0 1px 5px #f5bd4fbb, inset -1px -2px 3px #a75d13aa;z-index:2}\n.stream .drop:after{content:"";position:absolute;left:2px;top:2px;width:3px;height:5px;border-radius:50%;background:#fffde8;opacity:.95;filter:blur(.2px)}\n.stream .drop-a{top:18%;animation:dropTravel .52s linear infinite}\n.stream .drop-b{top:48%;width:8px;height:11px;margin-left:-4px;animation:dropTravel .58s linear -.24s infinite}\n.stream .drop-c{top:76%;width:11px;height:15px;margin-left:-5.5px;animation:dropTravel .62s linear -.42s infinite}\n@keyframes dropTravel{0%{transform:translate(-50%,-7px) scale(.65);opacity:0}15%{opacity:1}75%{opacity:1}100%{transform:translate(-50%,15px) scale(1.08);opacity:0}}
+.stream{position:absolute;height:0;width:4px;background:linear-gradient(90deg,#b87520 0%,#ffe9a8 32%,#fff8d9 50%,#edb84c 72%,#b87520 100%);border-radius:50%;z-index:4;pointer-events:none;transform-origin:top center;opacity:.92;filter:drop-shadow(0 0 3px #f5bd4f88);overflow:visible}\n.stream .drop{position:absolute;left:50%;display:block;width:10px;height:14px;margin-left:-5px;border-radius:55% 45% 58% 42%;background:radial-gradient(ellipse at 28% 22%,#fffde1 0 10%,#ffe08a 20%,#f2b943 48%,#c47a19 100%);box-shadow:0 1px 5px #f5bd4fbb, inset -1px -2px 3px #a75d13aa;z-index:2}\n.stream .drop:after{content:"";position:absolute;left:2px;top:2px;width:3px;height:5px;border-radius:50%;background:#fffde8;opacity:.95;filter:blur(.2px)}\n.stream .drop-a{top:0;animation:dropTravel .72s linear infinite}\n.stream .drop-b{top:0;width:8px;height:11px;margin-left:-4px;animation:dropTravel .78s linear -.25s infinite}\n.stream .drop-c{top:0;width:11px;height:15px;margin-left:-5.5px;animation:dropTravel .84s linear -.5s infinite}\n@keyframes dropTravel{0%{top:0;transform:translate(-50%,-10px) scale(.65);opacity:0}8%{opacity:1}88%{opacity:1}100%{top:calc(100% - 14px);transform:translate(-50%,0) scale(1.08);opacity:.95}}
 .stats{display:flex;justify-content:space-around;color:var(--muted);font-size:11px;margin:13px 0 8px}.stats b{display:block;color:white;font-size:20px;margin-top:3px}
 .status{display:flex;justify-content:space-between;gap:8px;margin-top:12px;background:#263a45;border-radius:14px;padding:11px 13px;color:var(--muted);font-size:12px}.status b{color:var(--gold)}
 .hint{font-size:12px;color:var(--muted);line-height:1.7;margin:12px 2px 0}
@@ -56,7 +56,7 @@ function render(){
 }
 function geometry(){
  const s=stage.getBoundingClientRect(),g=glass.getBoundingClientRect();
- return {center:g.left-s.left+g.width/2,top:g.top-s.top+4};
+ return {center:g.left-s.left+g.width/2,top:g.top-s.top+4,bottom:g.bottom-s.top};
 }
 // The bottle cap center is the fixed pivot: local coordinate (8px, 53px).
 function setMouth(x,y){bottle.style.left=(x-8)+'px';bottle.style.top=(y-53)+'px'}
@@ -64,7 +64,7 @@ function mouth(){return{x:parseFloat(bottle.style.left)+8,y:parseFloat(bottle.st
 function updateStream(p){
  const line=$('stream');
  if(!pouring){line.style.height='0';return}
- const g=geometry(),end={x:g.center,y:g.top+48};
+ const g=geometry(),glassInnerHeight=glass.clientHeight-8,liquidHeight=(beer+foam)/100*glassInnerHeight,end={x:g.center,y:g.bottom-5-liquidHeight};
  const dx=end.x-p.x,dy=end.y-p.y;
  line.style.left=p.x+'px';line.style.top=p.y+'px';
  line.style.width=(3.5+angle/65*5)+'px';
