@@ -79,9 +79,9 @@ function pourStep(){
    const add=Math.min(rate,100-beer-foam);beer+=add*(1-foamShare);foam+=add*foamShare;
  }
  render();updateStream(mouth());
- if(beer+foam>=99.999&&!judged){beer=100-foam;judged=true;render();stopPour();judge();}
+ if(beer+foam>=99.5&&!judged){beer=100-foam;judged=true;render();stopPour();judge();}
 }
-function startPour(){if(timer||beer+foam>=100)return;pouring=true;pourStep();timer=setInterval(pourStep,55)}
+function startPour(){if(judged||timer||beer+foam>=100)return;pouring=true;pourStep();if(pouring)timer=setInterval(pourStep,55)}
 function stopPour(){pouring=false;if(timer)clearInterval(timer);timer=null;$('stream').style.height='0'}
 function positionForPointer(clientX){
  const g=geometry(),candidate=startMouthX+(clientX-startX);
