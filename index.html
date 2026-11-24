@@ -57,7 +57,7 @@ bottle.addEventListener('pointerdown',e=>{e.preventDefault();bottle.setPointerCa
 bottle.addEventListener('pointermove',e=>{if(!bottle.classList.contains('dragging'))return;angle=Math.max(15,Math.min(85,dragStartAngle+(dragStartY-e.clientY)*0.65));angleChange()});
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>bottle.addEventListener(ev,stop));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
-function reset(){beer=0;foam=0;$('angle').value=35;angleChange();render();setTarget();}
+function reset(){beer=0;foam=0;angle=35;angleChange();render();setTarget();}
 function judge(){stop();let total=beer+foam,actual=total?foam/total*100:0;let fillError=Math.abs(100-total),foamError=Math.abs(target-actual);let score=Math.max(0,Math.round(100-(foamError*1.7)-(fillError*1.25)));if(total<35)score=Math.min(score,25);scores.push(score);$('game').classList.add('hidden');$('result').classList.remove('hidden');$('score').textContent=score+'点';let t=score>=95?'神泡マスター':score>=85?'職人級':score>=70?'上出来！':score>=50?'あと一歩':'修行中';$('resultTitle').textContent=t;$('resultText').textContent='目標の泡 '+target+'% ／ 実際の泡 '+Math.round(actual)+'% ／ 注いだ量 '+Math.round(total)+'%';$('nextBtn').textContent=round===5?'最終結果を見る':'次のラウンドへ';}
 $('judgeBtn').addEventListener('click',judge);
 $('nextBtn').addEventListener('click',()=>{if(round===5){finish();return}round++;$('result').classList.add('hidden');$('game').classList.remove('hidden');reset()});
