@@ -88,14 +88,14 @@ function positionForPointer(clientX){
  const s=stage.getBoundingClientRect(),g=geometry(),candidate=startMouthX+(clientX-startX);
  if(candidate>g.center){
    passedCenter=false;angle=0;setMouth(candidate,baseMouthY);
-   bottle.style.transform='rotate(0deg)';
+   bottle.style.transform='rotate(90deg)';
    stopPour();
  }else{
    passedCenter=true;
    // The bottle mouth is locked to the glass center. Further left movement pivots the body.
    setMouth(g.center,baseMouthY);
    angle=clamp((g.center-candidate)*.8,0,65);
-   bottle.style.transform='rotate('+(-angle)+'deg)';
+   bottle.style.transform='rotate('+(90-angle*2)+'deg)';
    if(!timer)startPour();
    const p=mouth();updateStream(p,isOverGlass({x:g.center,y:p.y+18}));
  }
@@ -113,7 +113,7 @@ function release(){if(!drag)return;drag=false;bottle.classList.remove('dragging'
 function reset(){
  beer=0;foam=0;spilled=0;angle=0;stopPour();
  const g=geometry();baseMouthY=g.top;setMouth(g.center+105,baseMouthY);
- bottle.style.transform='rotate(-90deg)';render();
+ bottle.style.transform='rotate(90deg)';render();
 }
 function judge(){
  stopPour();const total=beer+foam,actual=total?foam/total*100:0;
