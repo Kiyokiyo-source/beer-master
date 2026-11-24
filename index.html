@@ -36,22 +36,22 @@ main{width:min(100%,480px);margin:auto;padding:22px 16px 34px;text-align:center}
 <div class="stream" id="stream"></div>
 <div class="bottle-wrap" id="bottleWrap" role="button" aria-label="瓶をつかんで持ち上げ、傾けて注ぐ"><div class="bottle"><div class="bottle-label">BEER</div></div></div>
 </div>
-<div class="status"><span>こぼした量 <b id="spillVal">0%</b></span><span>瓶の傾き <b id="angleVal">0°</b></span></div>
+<div class="status"><span>瓶の傾き <b id="angleVal">0°</b></span><span>目標 <b>ビール70%・泡30%</b></span></div>
 <div class="hint" style="text-align:left;background:#263a45;border-radius:14px;padding:12px 14px;margin-top:14px"><b style="color:#f5bd4f">🍺 おいしく注ぐコツ</b><br>・瓶を浅い角度にすると、ゆっくり注げてビール多め。<br>・瓶を縦に近づけるほど、勢いよく注げて泡がたくさん出るよ。<br>・7:3を目指して、左へ動かす量で角度を調整しよう！</div>
-<button class="action" id="judgeBtn">この一杯で勝負する</button>
+
 </div></section>
 <section id="result" class="panel hidden"><div class="target">YOUR RESULT</div><div class="result-score" id="score">--</div><div class="result-title" id="resultTitle"></div><p id="resultText" class="hint"></p><div id="badges"></div><button class="action" id="restartBtn">もう一度挑戦する</button></section>
 </main>
 <script>
 (()=>{
 const $=id=>document.getElementById(id),stage=$('stage'),bottle=$('bottleWrap'),glass=$('beer').parentElement;
-let beer=0,foam=0,spilled=0,angle=0,pouring=false,drag=false,timer=null;
+let beer=0,foam=0,angle=0,pouring=false,drag=false,timer=null,judged=false;
 let startX=0,startMouthX=0,baseMouthY=0,approachDistance=1,hasReachedCenter=false;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function render(){
  $('beer').style.height=beer+'%';$('foam').style.bottom=beer+'%';$('foam').style.height=foam+'%';
  $('beerVal').textContent=Math.round(beer)+'%';$('foamVal').textContent=Math.round(foam)+'%';
- $('totalVal').textContent=Math.round(beer+foam)+'%';$('spillVal').textContent=Math.round(spilled)+'%';
+ $('totalVal').textContent=Math.round(beer+foam)+'%';
  $('angleVal').textContent=Math.round(angle)+'°';
 }
 function geometry(){
@@ -76,9 +76,9 @@ function pourStep(){
  const streamHitsGlass=mouth().x>=g.center-3&&mouth().x<=g.center+3;
  if(streamHitsGlass&&beer+foam<100){
    const add=Math.min(rate,100-beer-foam);beer+=add*(1-foamShare);foam+=add*foamShare;
- }else if(!streamHitsGlass){spilled+=rate}
+ }
  render();updateStream(mouth());
- if(beer+foam>=100)stopPour();
+ if(beer+foam>=99.999&&!judged){beer=100-foam;judged=true;render();stopPour();judge();}
 }
 function startPour(){if(timer||beer+foam>=100)return;pouring=true;pourStep();timer=setInterval(pourStep,55)}
 function stopPour(){pouring=false;if(timer)clearInterval(timer);timer=null;$('stream').style.height='0'}
@@ -109,23 +109,23 @@ bottle.addEventListener('pointermove',e=>{if(drag)positionForPointer(e.clientX)}
 function release(){if(!drag)return;drag=false;bottle.classList.remove('dragging');stopPour()}
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>bottle.addEventListener(ev,release));
 function reset(){
- beer=0;foam=0;spilled=0;angle=0;stopPour();hasReachedCenter=false;
+ beer=0;foam=0;angle=0;judged=false;stopPour();hasReachedCenter=false;
  const g=geometry();baseMouthY=g.top-8;setMouth(g.center+105,baseMouthY);
  bottle.style.transform='rotate(90deg)';render();
 }
 function judge(){
  stopPour();const total=beer+foam,actual=total?foam/total*100:0;
- const ratioError=Math.abs(actual-30),fillError=Math.abs(100-total),spillPenalty=Math.min(25,spilled*.35);
- let score=clamp(Math.round(100-ratioError*1.7-fillError*.8-spillPenalty),0,100);
+ const ratioError=Math.abs(actual-30),fillError=Math.abs(100-total);
+ let score=clamp(Math.round(100-ratioError*1.7-fillError*.8),0,100);
  if(total<25)score=Math.min(score,20);
  const title=score>=95?'伝説の7:3マスター':score>=85?'黄金比の職人':score>=70?'一流の注ぎ手':score>=50?'あと少し！':'泡修行中';
  $('score').textContent=score+'点';$('resultTitle').textContent=title;
- $('resultText').textContent='ビール '+Math.round(beer)+'% ／ 泡 '+Math.round(foam)+'% ／ こぼした量 '+Math.round(spilled)+'% ／ 泡比率 '+Math.round(actual)+'%';
- let badges=[];if(score>=95)badges.push('🏆 神泡の黄金比を達成！');if(spilled===0&&total>=90)badges.push('🎯 一滴もこぼさず満タン！');if(actual>=27&&actual<=33&&total>=85)badges.push('🍺 理想の7:3に到達！');
+ $('resultText').textContent='ビール '+Math.round(beer)+'% ／ 泡 '+Math.round(foam)+'% ／ 泡比率 '+Math.round(actual)+'%';
+ let badges=[];if(score>=95)badges.push('🏆 神泡の黄金比を達成！');if(actual>=27&&actual<=33&&total>=85)badges.push('🍺 理想の7:3に到達！');
  $('badges').innerHTML=badges.map(x=>'<div class="achievement">'+x+'</div>').join('')||'<div class="achievement">🍻 次はもっと理想の7:3を目指そう！</div>';
  $('game').classList.add('hidden');$('result').classList.remove('hidden');
 }
-$('judgeBtn').addEventListener('click',judge);
+
 $('restartBtn').addEventListener('click',()=>{$('result').classList.add('hidden');$('game').classList.remove('hidden');reset()});
 window.addEventListener('resize',()=>{if(!drag)reset()});
 reset();
