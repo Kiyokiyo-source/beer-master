@@ -72,7 +72,7 @@ function updateStream(p){
 }
 function pourStep(){
  if(!pouring)return;
- const g=geometry(),rate=.48+(angle/65)*1.12,foamShare=clamp(.10+(angle/65)*.48,.10,.58);
+ const g=geometry(),rate=.62+(angle/65)*1.38,foamShare=clamp(.08+(angle/65)*.72,.08,.78);
  // Pouring only begins once the bottle mouth reaches the center of the glass.
  const streamHitsGlass=mouth().x>=g.center-3&&mouth().x<=g.center+3;
  if(streamHitsGlass&&beer+foam<100){
