@@ -15,7 +15,7 @@ main{width:min(100%,480px);margin:auto;padding:22px 16px 34px;text-align:center}
 .foam{position:absolute;left:0;width:100%;height:0;background:linear-gradient(#fffdf2,#f4e6c4);transition:height .08s linear;z-index:2}
 .bubbles{position:absolute;inset:0;background-image:radial-gradient(#fff9 1px,transparent 2px),radial-gradient(#fff6 1px,transparent 2px);background-size:23px 29px,31px 37px;background-position:0 0,10px 13px;opacity:.28;pointer-events:none;z-index:3}
 .glass-mark{position:absolute;right:7px;top:8px;color:#ffffff70;font-size:9px;writing-mode:vertical-rl;letter-spacing:.1em;z-index:4}
-.bottle-wrap{position:absolute;right:8px;top:14px;width:220px;height:105px;transform-origin:24px 78px;transition:transform .12s ease;z-index:5}
+.bottle-wrap{position:absolute;left:calc(50% - 110px);top:18px;width:220px;height:105px;transform-origin:24px 78px;z-index:5;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}.bottle-wrap.dragging{cursor:grabbing;filter:drop-shadow(0 0 8px #f5bd4f88)}
 .bottle{position:absolute;right:0;top:28px;width:175px;height:54px;border-radius:15px 22px 22px 15px;background:linear-gradient(180deg,#8eae62,#476c37 45%,#29452b 70%,#79994e);border:2px solid #a5bd78;box-shadow:inset 0 5px 8px #ffffff35,0 7px 12px #0005}
 .bottle:before{content:"";position:absolute;left:-34px;top:13px;width:38px;height:25px;border-radius:5px 0 0 5px;background:linear-gradient(#78984c,#395c32);border:2px solid #9bb36d}
 .bottle:after{content:"";position:absolute;left:-42px;top:15px;width:10px;height:21px;border-radius:3px;background:#c8b77b;border:1px solid #eee0a8}
@@ -23,8 +23,7 @@ main{width:min(100%,480px);margin:auto;padding:22px 16px 34px;text-align:center}
 .stream{position:absolute;left:0;top:78px;width:4px;height:0;background:linear-gradient(90deg,#f6d17b,#fff0b5);border-radius:8px;transform:rotate(-18deg);transform-origin:top;opacity:.9;z-index:4}
 .stats{display:flex;justify-content:space-around;color:var(--muted);font-size:11px;margin-top:8px}.stats b{display:block;color:white;font-size:19px;margin-top:3px}
 .rounddots{display:flex;gap:6px;justify-content:center;margin:12px}.dot{width:8px;height:8px;border-radius:50%;background:#52636d}.dot.done{background:var(--gold)}
-.anglebox{background:#263a45;border-radius:16px;padding:13px 14px;margin-top:14px;text-align:left}.angle-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}.angle-head strong{font-size:22px;color:var(--gold)}input[type=range]{width:100%;accent-color:var(--gold);margin:15px 0 5px;height:24px}.scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
-.pour{width:100%;margin-top:14px;padding:18px;border:0;border-radius:16px;background:var(--gold);color:#38240a;font:inherit;font-size:17px;font-weight:900;box-shadow:0 5px 0 #a66b19;touch-action:none;user-select:none;-webkit-user-select:none}.pour:active{transform:translateY(3px);box-shadow:0 2px 0 #a66b19}.pour small{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:4px}
+.anglebox{background:#263a45;border-radius:16px;padding:12px 14px;margin-top:12px;text-align:center}.angle-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}.angle-head strong{font-size:22px;color:var(--gold)}.scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
 .action{background:#344956;color:white;width:100%;border:0;border-radius:15px;padding:15px;font:inherit;font-weight:800;margin-top:13px}
 .hint{font-size:12px;color:var(--muted);line-height:1.65;margin:11px 0 0}.hidden{display:none!important}.result-score{font-size:52px;color:var(--gold);font-weight:900}.result-title{font-size:23px;font-weight:900;margin:4px}.achievement{background:#263a45;border-radius:14px;padding:12px;margin:8px 0;text-align:left;font-size:13px}.achievement b{color:var(--gold)}
 </style></head>
@@ -33,30 +32,31 @@ main{width:min(100%,480px);margin:auto;padding:22px 16px 34px;text-align:center}
 <section id="game"><div class="panel">
 <div class="target">今回のお題 <strong id="target">泡 25%</strong></div>
 <div class="stage">
-<div class="bottle-wrap" id="bottleWrap"><div class="bottle"><div class="bottle-label">BEER</div></div></div>
+<div class="bottle-wrap" id="bottleWrap" role="button" aria-label="瓶をつかんで上下に動かして傾ける"><div class="bottle"><div class="bottle-label">BEER</div></div></div>
 <div class="stream" id="stream"></div>
 <div class="glass"><div class="beer" id="beer"></div><div class="foam" id="foam"></div><div class="bubbles"></div><div class="glass-mark">BEER MASTER</div></div>
 </div>
 <div class="stats"><div>ビール<b id="beerVal">0%</b></div><div>泡<b id="foamVal">0%</b></div><div>合計<b id="totalVal">0%</b></div></div>
 <div class="rounddots" id="dots"></div>
-<div class="anglebox"><div class="angle-head"><span>🍾 瓶の傾き</span><strong><span id="angleVal">35</span>°</strong></div><input id="angle" type="range" min="15" max="85" value="35"><div class="scale"><span>ゆっくり・泡少なめ</span><span>勢いよく・泡多め</span></div></div>
-<button class="pour" id="pourBtn">🍺 注ぐ（長押し）<small>押している間、瓶から注がれるよ</small></button>
-<p class="hint">瓶の角度を変えながら注ごう。浅い角度はビール多め、立てるほど泡が増えるよ。泡はビールの上にたまります。</p>
+<div class="anglebox"><div class="angle-head"><span>🍾 瓶の傾き</span><strong><span id="angleVal">35</span>°</strong></div><div class="scale"><span>水平：ビール多め</span><span>立てる：泡多め</span></div></div>
+<p class="hint">瓶を指でつかんで上下に動かそう。瓶を傾けている間だけ注がれるよ。</p>
 <button class="action" id="judgeBtn">この一杯を完成させる</button>
 </div></section>
 <section id="result" class="panel hidden"><div class="target">ROUND RESULT</div><div class="result-score" id="score">--</div><div class="result-title" id="resultTitle"></div><p id="resultText" class="hint"></p><button class="action" id="nextBtn">次のラウンドへ</button></section>
 <section id="final" class="panel hidden"><div class="target">YOUR RANK</div><div class="result-title" id="rankTitle"></div><div class="result-score" id="finalScore"></div><p class="hint" id="finalText"></p><div id="badges"></div><button class="action" id="restartBtn">もう一度挑戦する</button></section>
 </main>
 <script>
-(()=>{const $=id=>document.getElementById(id);let beer=0,foam=0,target=25,round=1,scores=[],timer=null;
+(()=>{const $=id=>document.getElementById(id);let beer=0,foam=0,target=25,round=1,scores=[],timer=null,angle=35,dragStartY=0,dragStartAngle=35;
 function setTarget(){target=Math.floor(Math.random()*31)+10;$('target').textContent='泡 '+target+'%';}
 function render(){$('beer').style.height=beer+'%';$('foam').style.bottom=beer+'%';$('foam').style.height=foam+'%';$('beerVal').textContent=Math.round(beer)+'%';$('foamVal').textContent=Math.round(foam)+'%';$('totalVal').textContent=Math.round(beer+foam)+'%';$('dots').innerHTML=Array.from({length:5},(_,i)=>'<span class="dot '+(i<round?'done':'')+'"></span>').join('');}
-function angleChange(){let a=Number($('angle').value);$('angleVal').textContent=a;$('bottleWrap').style.transform='rotate('+(-a+35)+'deg)';}
-function pourStep(){if(beer+foam>=100){stop();return}let a=Number($('angle').value);let foamShare=0.06+((a-15)/70)*0.48;let amount=0.42+(a/85)*0.72;let add= Math.min(amount,100-beer-foam);let f=add*foamShare;foam=Math.min(100-beer-foam,foam+f);beer=Math.min(100-foam,beer+(add-f));render();$('stream').style.height='42px';}
-function stop() {if(timer)clearInterval(timer);timer=null;$('stream').style.height='0';}
-$('angle').addEventListener('input',angleChange);angleChange();
-$('pourBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(timer)return;pourStep();timer=setInterval(pourStep,55)});
-['pointerup','pointercancel','pointerleave'].forEach(ev=>$('pourBtn').addEventListener(ev,stop));document.addEventListener('pointerup',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
+function angleChange(){$('angleVal').textContent=Math.round(angle);$('bottleWrap').style.transform='rotate('+(-angle+15)+'deg)';}
+function pourStep(){let total=beer+foam;if(total>=100){stop();return}let share=0.08+((angle-15)/70)*0.62;let flow=0.68;let add=Math.min(flow,100-total);let nextFoam=foam+add*share;let nextBeer=beer+add*(1-share);let scale=(beer+foam+add)>100? (100-total)/add:1;foam+=add*share*scale;beer+=add*(1-share)*scale;let exact=beer+foam;if(exact>100){beer*=100/exact;foam*=100/exact}render();$('stream').style.height='42px';}
+function stop(){if(timer)clearInterval(timer);timer=null;$('stream').style.height='0';$('bottleWrap').classList.remove('dragging');}
+const bottle=$('bottleWrap');
+bottle.addEventListener('pointerdown',e=>{e.preventDefault();bottle.setPointerCapture(e.pointerId);bottle.classList.add('dragging');dragStartY=e.clientY;dragStartAngle=angle;timer=setInterval(pourStep,55)});
+bottle.addEventListener('pointermove',e=>{if(!bottle.classList.contains('dragging'))return;angle=Math.max(15,Math.min(85,dragStartAngle+(dragStartY-e.clientY)*0.65));angleChange()});
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>bottle.addEventListener(ev,stop));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});
 function reset(){beer=0;foam=0;$('angle').value=35;angleChange();render();setTarget();}
 function judge(){stop();let total=beer+foam,actual=total?foam/total*100:0;let fillError=Math.abs(100-total),foamError=Math.abs(target-actual);let score=Math.max(0,Math.round(100-(foamError*1.7)-(fillError*1.25)));if(total<35)score=Math.min(score,25);scores.push(score);$('game').classList.add('hidden');$('result').classList.remove('hidden');$('score').textContent=score+'点';let t=score>=95?'神泡マスター':score>=85?'職人級':score>=70?'上出来！':score>=50?'あと一歩':'修行中';$('resultTitle').textContent=t;$('resultText').textContent='目標の泡 '+target+'% ／ 実際の泡 '+Math.round(actual)+'% ／ 注いだ量 '+Math.round(total)+'%';$('nextBtn').textContent=round===5?'最終結果を見る':'次のラウンドへ';}
 $('judgeBtn').addEventListener('click',judge);
