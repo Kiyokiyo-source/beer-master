@@ -125,10 +125,10 @@ function judge(){
  $('resultText').textContent='ビール '+Math.round(beer)+'% ／ 泡 '+Math.round(foam)+'% ／ 泡比率 '+Math.round(actual)+'%';
  let badges=[];if(score>=95)badges.push('🏆 神泡の黄金比を達成！');if(actual>=27&&actual<=33&&total>=85)badges.push('🍺 理想の7:3に到達！');
  $('badges').innerHTML=badges.map(x=>'<div class="achievement">'+x+'</div>').join('')||'<div class="achievement">🍻 次はもっと理想の7:3を目指そう！</div>';
- $('gameHeader').classList.add('hidden');$('game').classList.add('hidden');$('result').classList.remove('hidden');
+ $('gameHeader').style.display='none';$('game').style.display='none';$('result').classList.remove('hidden');$('result').style.display='block';
 }
 
-$('restartBtn').addEventListener('click',()=>{$('result').classList.add('hidden');$('gameHeader').classList.remove('hidden');$('game').classList.remove('hidden');reset()});
+$('restartBtn').addEventListener('click',()=>{$('result').style.display='none';$('result').classList.add('hidden');$('gameHeader').style.display='';$('game').style.display='';reset()});
 window.addEventListener('resize',()=>{if(!drag)reset()});
 reset();
 })();
